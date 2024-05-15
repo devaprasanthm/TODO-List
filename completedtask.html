@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Completed Tasks</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="completed-task-container">
+  <h1>Completed Tasks</h1>
+  <ul id="completedTaskList">
+    
+  </ul>
+  <a href="index.html" style="text-decoration: none;" id="complete-btn"><button>Back to Todo Home Page</button> </a>
+  <a href="addtask.html" style="text-decoration: none;" id="complete-btn"> <button>Add Task Page</button> </a>
+</div>
+<script src="script.js"></script>
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  renderCompletedTasks();
+});
+
+
+function renderCompletedTasks() {
+  var completedTaskList = document.getElementById("completedTaskList");
+  completedTaskList.innerHTML = ''; 
+
+  var completedTasks = JSON.parse(localStorage.getItem("completedTasks")) || [];
+
+  completedTasks.forEach(function(task) {
+    var li = document.createElement("li");
+    li.textContent = task.name;
+    var deleteButton = document.createElement("button");
+    deleteButton.textContent = "Delete";
+    deleteButton.onclick = function() {
+      deleteTask(task);
+      renderCompletedTasks(); 
+    };
+    li.appendChild(deleteButton);
+    completedTaskList.appendChild(li);
+  });
+}
+
+
+function deleteTask(task) {
+  var completedTasks = JSON.parse(localStorage.getItem("completedTasks")) || [];
+  var index = completedTasks.findIndex(function(t) {
+    return t.name === task.name;
+  });
+  if (index !== -1) {
+    completedTasks.splice(index, 1);
+    localStorage.setItem("completedTasks", JSON.stringify(completedTasks));
+  }
+}
+</script>
+</body>
+</html>

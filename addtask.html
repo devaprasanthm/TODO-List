@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit Task</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="add-task-container">
+  <h1>Edit Task</h1>
+  <input type="hidden" id="taskId"> 
+  
+  <input type="text" id="taskInput" placeholder="Enter task...">
+  <input type="date" id="dueDate">
+  <button onclick="saveTask()">Save Changes</button>
+  <button onclick="cancel()">Cancel</button>
+</div>
+<script src="script.js"></script>
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  var urlParams = new URLSearchParams(window.location.search);
+  var taskId = urlParams.get('id');
+
+  if (taskId) {
+    
+    var task = getTaskById(taskId);
+    if (task) {
+      
+      document.getElementById("taskId").value = taskId;
+      document.getElementById("taskInput").value = task.name;
+      document.getElementById("dueDate").value = task.dueDate;
+    } else {
+      alert("Task not found!");
+      window.location.href = "index.html"; 
+    }
+  }
+});
+
+
+function getTaskById(id) {
+  var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  return tasks.find(task => task.id === id);
+}
+
+
+function saveTask() {
+  var taskId = document.getElementById("taskId").value;
+  var taskInput = document.getElementById("taskInput").value;
+  var dueDate = document.getElementById("dueDate").value;
+
+  if (taskId) {
+    
+    var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    var taskIndex = tasks.findIndex(task => task.id === taskId);
+    if (taskIndex !== -1) {
+      tasks[taskIndex].name = taskInput;
+      tasks[taskIndex].dueDate = dueDate;
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+      alert("Task updated successfully!");
+      window.location.href = "index.html"; 
+    } else {
+      alert("Task not found!");
+      window.location.href = "index.html"; 
+    }
+  } else {
+    
+    taskId = 'task-' + Date.now(); 
+
+    
+    var newTask = { id: taskId, name: taskInput, dueDate: dueDate };
+    var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+    tasks.push(newTask);
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+
+    alert("New task added successfully!");
+    window.location.href = "index.html"; 
+  }
+}
+
+
+function cancel() {
+  window.location.href = "index.html";
+}
+</script>
+</body>
+</html>

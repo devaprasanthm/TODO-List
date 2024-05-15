@@ -1,0 +1,118 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Todo List</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+<div class="todo-container">
+  <h1>Todo List</h1>
+  <br>
+  <div class="new-task">
+    <h2 style="text-align: center;">New Task</h2>
+    <input type="text" id="taskInput" placeholder="Enter task...">
+    <input type="date" id="dueDate">
+    <button onclick="addTask()">Add Task</button>
+  </div>
+  <ul id="taskList">
+   
+  </ul>
+  <div class="btns">
+  <button onclick="deleteAndMoveTasks()" >Delete Selected Tasks</button> 
+  <a href="completedtask.html" style="text-decoration: none;"><button id="complete-btn">Completed Task Page</button></a>
+  </div>
+</div>
+<script src="script.js"></script>
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+  renderTasks();
+});
+
+
+function renderTasks() {
+  var taskList = document.getElementById("taskList");
+  taskList.innerHTML = ''; 
+
+  var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  tasks.forEach(function(task) {
+    var li = document.createElement("li");
+    var checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.value = task.id;
+    li.appendChild(checkbox);
+
+    var label = document.createElement("label");
+    label.textContent = task.name;
+    li.appendChild(label);
+
+    var editButton = document.createElement("button"); 
+    editButton.textContent = "Edit";
+    editButton.onclick = function() {
+      editTask(task.id); 
+    };
+    li.appendChild(editButton);
+
+    taskList.appendChild(li);
+  });
+}
+
+
+function addTask() {
+  var taskInput = document.getElementById("taskInput").value;
+  var dueDate = document.getElementById("dueDate").value;
+
+  if (taskInput.trim() === "") {
+    alert("Please enter a task!");
+    return;
+  }
+
+  
+  var taskId = 'task-' + Date.now();
+
+
+  var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  tasks.push({ id: taskId, name: taskInput, dueDate: dueDate });
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+
+  renderTasks(); 
+  alert("Task added successfully!");
+}
+
+
+function deleteAndMoveTasks() {
+  var checkboxes = document.querySelectorAll('#taskList input[type="checkbox"]:checked');
+  var tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+  var completedTasks = JSON.parse(localStorage.getItem("completedTasks")) || [];
+
+  checkboxes.forEach(function(checkbox) {
+    var taskId = checkbox.value;
+    var taskIndex = tasks.findIndex(task => task.id === taskId);
+    if (taskIndex !== -1) {
+      
+      completedTasks.push(tasks[taskIndex]);
+      
+      tasks.splice(taskIndex, 1);
+    }
+  });
+
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+  localStorage.setItem("completedTasks", JSON.stringify(completedTasks));
+
+  renderTasks(); 
+  
+}
+
+
+
+function editTask(taskId) {
+  window.location.href = "addtask.html?id=" + taskId;
+}
+</script>
+</body>
+</html>
